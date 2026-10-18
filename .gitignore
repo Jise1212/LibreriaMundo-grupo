@@ -1,0 +1,48 @@
+# ==============================================================================
+# .gitignore - LibroMundo WordPress / Docker Environment
+# ==============================================================================
+
+# Variables de entorno y secretos de infraestructura
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.crt
+
+# Credenciales de base de datos y respaldos
+*.sql
+*.sql.gz
+*.tar.gz
+*.bak
+backups/
+
+# Archivos pesados y multimedia de WordPress
+uploads-custom/
+wp-content/uploads/
+wp-content/blogs.dir/
+wp-content/upgrade/
+
+# Archivos de configuración sensible de WordPress
+wp-config.php
+wp-config-sample.php
+
+# Caché y logs
+*.log
+wp-content/cache/
+wp-content/w3tc-cache/
+error_log
+debug.log
+
+# Dependencias y paquetes
+node_modules/
+vendor/
+
+# Archivos del sistema operativo y editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
