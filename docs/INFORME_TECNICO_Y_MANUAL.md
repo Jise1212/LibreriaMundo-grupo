@@ -1,112 +1,201 @@
-# INFORME TÉCNICO Y MANUAL DE PRUEBAS DEL SISTEMA E-COMMERCE LIBROMUNDO
-**Asignatura:** Ingeniería Web  
-**Proyecto:** Plataforma de Comercio Electrónico "LibroMundo (Librería y Papelería)"  
-**Arquitectura:** WordPress 6.5 + WooCommerce 8.x + MariaDB/MySQL 8.0 en Contenedores Docker  
-**Calificación Objetivo:** 10/10 Puntos  
+# INFORME TÉCNICO INTEGRAL Y MANUAL DE PROCEDIMIENTOS: SISTEMA E-COMMERCE LIBROMUNDO
+
+**Institución / Asignatura:** Ingeniería Web / Comercio Electrónico  
+**Proyecto:** Plataforma E-Commerce "LibroMundo (Librería & Papelería Universitaria)"  
+**Arquitectura:** WordPress 6.5 + WooCommerce 11.x + MySQL 8.0 en Contenedores Docker  
+**Repositorio Oficial:** [GitHub - LibreriaMundo-grupo](https://github.com/Jise1212/LibreriaMundo-grupo.git)  
+**Contacto Oficial WhatsApp:** `+593 98 785 2260` (`0987852260`)  
+**Fecha de Actualización:** Octubre 2026  
 
 ---
 
-# PARTE 1: INFORME TÉCNICO DE ARQUITECTURA E IMPLEMENTACIÓN
+## 1. RESUMEN EJECUTIVO Y OBJETIVOS DEL SISTEMA
 
-## 1. RESUMEN EJECUTIVO
-**LibroMundo** es una solución de comercio electrónico desarrollada para la gestión, exhibición y comercialización multicanal de productos editoriales impresos, recursos de lectura digital (Ebooks) y artículos de papelería y estudio técnico. 
+**LibroMundo** es una solución e-commerce moderna desarrollada para la comercialización de literatura, libros académicos, artículos de papelería técnica y productos digitales descargables (Ebooks). 
 
-El modelo de negocio combina la venta tradicional de inventario físico (con control estricto de pesos, cubicaje y logística terrestre) con la distribución instantánea de propiedad intelectual digital bajo protocolos seguros de caducidad temporal y cuotas máximas de descarga. La plataforma opera sobre una arquitectura contenerizada desacoplada, orientada a la portabilidad, reproducibilidad de entornos e integridad transaccional.
+El sistema implementa de extremo a extremo:
+1. **Infraestructura contenerizada reproducible y segura** basada en microservicios Docker (`db`, `wordpress`, `phpmyadmin`).
+2. **Catálogo mixto estructurado:** Libros físicos con control de inventario y cubicaje, productos de papelería simples y con variaciones de color y tamaño, y **Ebooks digitales con restricciones criptográficas de acceso, cuotas máximas de descarga (3 intentos) y caducidad temporal estricta (7 días)**.
+3. **Régimen tributario y logístico para Ecuador:** Moneda oficial USD ($), cálculo de IVA 15% conforme a la normativa ecuatoriana (Azuay / Cuenca), tarifas de envío planas para productos físicos y omisión automática de flete en carritos puramente digitales.
+4. **Pasarelas de pago informativas y offline:** Transferencia bancaria directa (Banco Pichincha y Banco Guayaquil con cuentas e instrucciones institucionales) y pago contra entrega (COD).
+5. **Servicio transaccional de correo electrónico profesional:** Conexión SMTP cifrada por el puerto `2525` mediante FluentSMTP y Mailtrap Sandbox, dotada de un mecanismo de **throttle anti rate-limit** para garantizar la recepción simultánea de notificaciones al vendedor y facturas/enlaces de descarga al cliente.
+6. **Integración conversacional directa con WhatsApp (`0987852260`):** Botón flotante omnicanal y botón dinámico contextual en la ficha de cada producto para consultas de disponibilidad y pedidos bajo encargo.
+7. **Diseño editorial sobrio, limpio y moderno:** Personalización CSS en capas (`libromundo-design.php`) que aporta armonía visual en el catálogo, tarjetas con badges temáticos, cabecera fija, panel de usuario "Mi Cuenta" estilizado y páginas de políticas institucionales en formato pliego editorial.
 
 ---
 
-## 2. JUSTIFICACIÓN TÉCNICA DE LA ARQUITECTURA
+## 2. STACK TECNOLÓGICO Y HERRAMIENTAS UTILIZADAS
 
-### 2.1. Contenerización con Docker Compose vs. Ambientes Tradicionales (XAMPP / WAMP / CPanel)
-| Dimensión | Docker Compose (LibroMundo) | Servidores Locales Tradicionales (XAMPP/WAMP) | Hosting Compartido (CPanel Tradicional) |
+| Componente | Herramienta / Tecnología | Versión | Rol en la Arquitectura |
 | :--- | :--- | :--- | :--- |
-| **Aislamiento de Dependencias** | Total. PHP 8.2, Apache y MySQL 8.0 corren en contenedores independientes sin colisiones de librerías en el host. | Nulo. Depende de las DLLs o librerías del sistema operativo local. | Limitado a jaulas Chroot/CloudLinux compartidas con vecinos ruidosos. |
-| **Reproducibilidad (DevOps)** | Inmediata. El comando `docker compose up -d` despliega el entorno idéntico en Windows, Linux o macOS. | Baja. Requiere configuración manual de puertos, `php.ini` y extensiones en cada máquina. | Difícil de versionar y sincronizar con repositorios Git. |
-| **Persistencia y Volúmenes** | Control granular mediante Named Volumes (`db_data`, `wp_data`) aislados del código transitorio. | Mezcla los archivos del sistema operativo con la raíz `htdocs`. | Sujeta a límites de inodos y respaldos opacos. |
-| **Seguridad de Red** | Red interna privada tipo puente (`bridge`). MySQL no expone puertos al exterior; solo WordPress y phpMyAdmin se comunican en su red interna. | Expone puertos como el 3306 a la red local por defecto (riesgo crítico de seguridad). | Múltiples usuarios comparten puertos del servidor web. |
+| **Contenerización** | Docker & Docker Compose | Engine 26+ / Compose v2 | Aislamiento de servicios, redes internas y volúmenes persistentes. |
+| **Servidor Web / Runtime** | Apache 2.4 + PHP | 8.2-apache | Procesamiento de peticiones HTTP/HTTPS y ejecución de WordPress. |
+| **CMS & Motor E-Commerce** | WordPress + WooCommerce | 6.5 / 11.x | Gestión de contenidos, catálogo, pasarelas de pago, usuarios e impuestos. |
+| **Base de Datos** | MySQL Server | 8.0 | Motor relacional transaccional InnoDB con collation `utf8mb4_unicode_ci`. |
+| **Gestor de Base de Datos** | phpMyAdmin | Latest | Interfaz web de auditoría de tablas y respaldos SQL (puerto 8081). |
+| **Enrutamiento SMTP** | FluentSMTP Plugin | 2.2.x | Puente SMTP desacoplado con log de auditoría en base de datos (`lm_fsmpt_email_logs`). |
+| **Sandbox de Correos** | Mailtrap Email Sandbox | Host: `sandbox.smtp.mailtrap.io:2525` | Inspección de entrega de facturas y enlaces de Ebooks sin envíos a buzones reales. |
+| **Canal WhatsApp** | Joinchat + Mu-Plugin LibroMundo | 5.x / Snippet nativo | Botón flotante y botón contextual con metadatos del producto (SKU, nombre, URL). |
+| **Control de Versiones** | Git & GitHub | Git 2.45+ | Versionamiento de código, buenas prácticas de `.gitignore` y sincronización en la nube. |
 
 ---
 
-### 2.2. Justificación y Comparativa de Selección del Stack Tecnológico y Plugins
-Para garantizar un rendimiento óptimo sin sobrecargar el consumo de memoria RAM del contenedor ni degradar el *Time to First Byte (TTFB)*, se realizó una selección rigurosa de componentes:
+## 3. IMPLEMENTACIÓN PASO A PASO Y CONFIGURACIÓN DEL SISTEMA
 
-| Categoría | Solución Seleccionada | Alternativas Evaluadas | Criterio Técnico de Selección |
-| :--- | :--- | :--- | :--- |
-| **Motor E-commerce** | **WooCommerce** | Shopify, PrestaShop, Magento | Código abierto, sin cobro de comisiones porcentuales sobre venta, soporte nativo de productos virtuales/descargables sin costo de licencia y amplia extensibilidad mediante hooks de WordPress. |
-| **Enrutamiento SMTP** | **FluentSMTP** | WP Mail SMTP, Post SMTP, Easy WP SMTP | **Zero-Bloatware:** No muestra banners publicitarios, código optimizado sin telemetría pesada, almacena logs de auditoría de correos enviados en base de datos local y permite configuración segura con proveedores API/SMTP modernos. |
-| **Canal Conversacional** | **Joinchat + Snippet Nativo LibroMundo** | Click to Chat, Chatty, Tidio Live Chat | Cero impacto en el DOM. Carga asíncrona de scripts, compatibilidad total con enlaces estandarizados `wa.me`, sin peticiones a servidores de terceros que ralenticen la carga inicial del sitio. |
-| **Base de Datos** | **MySQL 8.0** | MySQL 5.7, MariaDB 10.4 | Mejoras en el optimizador de consultas de índices para tablas InnoDB transaccionales, compatibilidad total con collation `utf8mb4_unicode_ci` y soporte de JSON nativo. |
-
----
-
-## 3. INGENIERÍA DE SEGURIDAD APLICADA
-
-### 3.1. Protección de Credenciales y Secretos de Infraestructura
-1. **Principio de Mínima Exposición:** Ninguna contraseña de base de datos, credencial SMTP o clave de autenticación se encuentra hardcodeada (*quemada*) en el código fuente.
-2. **Inyección por Variables de Entorno (`.env`):** El archivo `docker-compose.yml` se alimenta exclusivamente de variables inyectadas en tiempo de ejecución.
-3. **Exclusión Estricta en Git (`.gitignore`):** El archivo `.env` está expresamente excluido del árbol de Git, evitando fugas de secretos en repositorios públicos o privados de GitHub/GitLab. Se suministra únicamente `.env.example` con valores de plantilla.
-4. **Blindaje de Archivos Pesados:** Las carpetas `wp-content/uploads/` y los respaldos SQL (`*.sql`, `*.sql.gz`) están bloqueados en el versionamiento para evitar saturación del buffer de Git y filtraciones de base de datos.
-
-### 3.2. Erradicación de la Vulnerabilidad de `mail()` Nativo de PHP
-El uso de la función interna `mail()` de PHP en servidores web representa una mala práctica severa por tres motivos arquitectónicos:
-1. **Falta de Servidor de Correo (MTA) en Docker:** Las imágenes estándar de PHP-Apache de Docker no incorporan un servicio Sendmail o Postfix configurado, lo que genera fallos silenciosos (*silent drops*) al intentar enviar notificaciones.
-2. **Reputación y Bloqueo Antispam:** Los correos emitidos por `mail()` carecen de registros SPF (*Sender Policy Framework*), firmas criptográficas DKIM (*DomainKeys Identified Mail*) y alineación DMARC, provocando que Gmail, Outlook o Yahoo los clasifiquen inmediatamente como SPAM o Phishing.
-3. **Bloqueo Síncrono del Hilo:** La llamada nativa a `mail()` bloquea el hilo de ejecución del servidor web mientras intenta negociar el socket de red, degradando la experiencia de compra del cliente en el checkout. **Solución implementada:** Delegación del transporte SMTP autenticado con cifrado TLS en el puerto 587 mediante FluentSMTP.
+### FASE 1: INFRAESTRUCTURA Y CONTENERIZACIÓN (Docker + Git)
+1. **Configuración de Variables de Entorno (`.env`):**
+   - Se definió un archivo secreto `.env` que almacena: `WORDPRESS_PORT=8080`, `PMA_PORT=8081`, `MYSQL_DATABASE=libromundo_db`, `MYSQL_USER=libromundo_user`, y contraseñas robustas.
+   - Se creó un archivo de muestra `.env.example` sanitizado para distribución pública.
+2. **Definición de Servicios en `docker-compose.yml`:**
+   - **`db` (MySQL 8.0):** Autenticación nativa `mysql_native_password`, collation UTF-8 y healthcheck activo (`mysqladmin ping`). Volumen persistente: `db_data`.
+   - **`wordpress` (WordPress 6.5 / PHP 8.2):** Depende del estado *healthy* de `db`. Prefijo de tablas `lm_`. Volúmenes: `wp_data` para el núcleo y `./uploads-custom` mapeado a `/var/www/html/wp-content/uploads/` para inyección de medios y scripts de mantenimiento.
+   - **`phpmyadmin`:** Acceso directo a la base de datos por el puerto host `8081`.
+   - **Red interna:** Red privada tipo puente `libromundo_net` que aisla a MySQL del exterior.
+3. **Blindaje del Repositorio (`.gitignore`):**
+   - Se excluyeron `.env`, backups SQL (`*.sql`, `*.sql.gz`), uploads masivos y archivos de sistema, evitando filtraciones de credenciales.
 
 ---
 
-## 4. CHECKLIST DE EVIDENCIAS Y CAPTURAS PARA RÚBRICA 10/10
+### FASE 2: CATÁLOGO DE PRODUCTOS Y RETO DE EBOOKS
+Se crearon y publicaron **10 productos oficiales** con portadas fotorrealistas en alta resolución:
 
-Para asegurar la calificación perfecta de 10 puntos en la evaluación académica, el equipo de desarrollo debe anexar las siguientes diez (10) capturas de pantalla organizadas:
-
-- [ ] **Captura 1 (Docker en Ejecución):** Terminal mostrando el comando `docker compose ps` con los 3 contenedores activos (`libromundo_mysql`, `libromundo_wordpress`, `libromundo_phpmyadmin`) con estado `Up (healthy)`.
-- [ ] **Captura 2 (Seguridad Git):** Editor de código o consola mostrando el archivo `.gitignore` con las exclusiones de `.env` y `wp-content/uploads/`, junto al comando `git status` que demuestre que el archivo `.env` no es rastreado.
-- [ ] **Captura 3 (Importación Exitosa del Catálogo):** Panel de `WooCommerce -> Productos` con los 10 productos listados, mostrando sus categorías, precios, inventario y visibilidad.
-- [ ] **Captura 4 (Reto Adicional Ebooks):** Ficha de edición de un Ebook (ej. "El Arte de la Guerra") evidenciando las casillas "Virtual" y "Descargable" marcadas, el límite de descargas fijado en `3` y la caducidad en `7` días.
-- [ ] **Captura 5 (Políticas de Descargas Seguras):** Pestaña `WooCommerce -> Ajustes -> Productos -> Productos descargables` mostrando el método *"Forzar descargas"* activo y la restricción de descarga tras el pago.
-- [ ] **Captura 6 (Impuestos y Moneda de Ecuador):** `WooCommerce -> Ajustes -> General` (Moneda: USD) y `WooCommerce -> Ajustes -> Impuesto` con la tasa estándar de IVA al `15%` configurada para Ecuador (`EC`).
-- [ ] **Captura 7 (Métodos de Pago y Envíos):** Pantalla de `WooCommerce -> Ajustes -> Pagos` con Transferencia Bancaria y Contra Entrega habilitados; y `Ajustes -> Envío` con la zona "Zona Austro" y tarifa plana para físicos.
-- [ ] **Captura 8 (Auditoría SMTP):** Panel de `FluentSMTP -> Settings` con la conexión validada a Mailtrap o Brevo, y la pantalla de `Email Logs` mostrando el correo de prueba exitoso (*Status: Sent*).
-- [ ] **Captura 9 (Ficha de Producto con Botón WhatsApp):** Vista de un libro en la tienda pública mostrando el botón personalizado *"¿Libro agotado o por encargo? Consultar disponibilidad"*, y la pestaña de WhatsApp abierta con el mensaje codificado que incluye el título del libro.
-- [ ] **Captura 10 (Prueba Integral del Checkout):** Pantalla de pedido recibido con un carrito mixto, donde el costo de envío solo se cobra sobre el producto físico, acompañado del correo recibido por el cliente con el enlace de descarga del Ebook.
+1. **4 Libros Físicos (Inventario con peso y dimensiones):**
+   - *1984* - George Orwell ($16.10 con IVA).
+   - *Cien años de soledad* - Gabriel García Márquez ($21.28 con IVA).
+   - *Hábitos Atómicos* - James Clear ($24.15 con IVA).
+   - *Breve historia del tiempo* - Stephen Hawking ($22.89 con IVA).
+2. **3 Ebooks Digitales (Configuración del Reto Especial):**
+   - *Ebook: El Arte de la Guerra* - Sun Tzu ($5.18 con IVA).
+   - *Ebook: El Principito* - Antoine de Saint-Exupéry ($4.49 con IVA).
+   - *Ebook: La Metamorfosis* - Franz Kafka ($3.91 con IVA).
+   - **Parámetros configurados:** Casillas **"Virtual"** y **"Descargable"** activas; límite estricto de **3 descargas** (`_download_limit = 3`); caducidad temporal de **7 días** (`_download_expiry = 7`). Método de entrega configurado como **"Forzar descargas"** y acceso condicionado a compra confirmada.
+3. **2 Artículos de Papelería Simples:**
+   - *Pluma Estilográfica Lamy Safari Negra* ($32.20 con IVA).
+   - *Set Resaltadores Stabilo Boss Pastel (6 uds)* ($9.78 con IVA).
+4. **1 Artículo de Papelería Variable:**
+   - *Agenda Académica LibroMundo 2026:* 2 Atributos globales (Color: Azul Marino, Marrón Cuero, Negro Ónix / Tamaño: A5 Diario, A6 Semanal), generando 6 variaciones con stock individual y precios diferenciados ($18.98 a $22.43 con IVA).
 
 ---
 
-# PARTE 2: MANUAL DE USUARIO Y PROTOCOLO DE PRUEBAS DE LA TIENDA
+### FASE 3: IMPUESTOS, MONEDA Y ZONAS DE ENVÍO
+1. **Moneda y Ubicación Comercial:**
+   - País: Ecuador (`EC`). Provincia: Azuay (`EC-A`). Ciudad: Cuenca.
+   - Moneda: Dólar estadounidense (`$ USD`).
+2. **Configuración del IVA al 15%:**
+   - En `WooCommerce > Ajustes > Impuesto`, se activó el cálculo de impuestos y visualización con precios finales en la tienda.
+   - En la tabla de tarifas estándar de impuestos se ingresó: Código de país `EC`, Tarifa `%`: `15.0000`, Nombre del impuesto: `IVA 15%`, aplicado a productos y cargos de envío.
+3. **Zonas y Métodos de Envío:**
+   - Se configuró la **"Zona Austro (Cuenca y Cañar)"** con tarifa plana de **$2.50 (+ IVA)** para artículos físicos.
+   - El sistema omite automáticamente los campos de envío cuando el carrito contiene únicamente Ebooks digitales.
 
-## 1. FLUJO PASO A PASO PARA EL CLIENTE
+---
 
-### Paso 1: Selección de Productos en el Catálogo
-1. Ingrese a la tienda en línea `http://localhost:8080/tienda/`.
-2. Filtre por la categoría **"Libros Físicos"** y añada al carrito el título *"Hábitos Atómicos"* (Precio: $21.00).
-3. Navegue a la categoría **"Ebooks Digitales"** y añada al carrito el título *"Ebook: El Arte de la Guerra"* (Precio: $5.99).
-4. Haga clic en el icono del carrito en la esquina superior derecha y presione **"Ver Carrito"** o **"Finalizar Compra"**.
+### FASE 4: PASARELAS DE PAGO (BACS Y COD)
+1. **Transferencia Bancaria Directa (BACS):**
+   - Configurada con instrucciones oficiales de depósito/transferencia a nombre de *LibroMundo Cía. Ltda.* (RUC: `0190456789001`):
+     - **Banco Pichincha:** Cuenta Corriente No. `2100874512`.
+     - **Banco Guayaquil:** Cuenta Corriente No. `1145896320`.
+   - Instrucciones automáticas al cliente para reportar el comprobante a `pedidos@libromundo.ec` o vía WhatsApp.
+2. **Pago Contra Entrega (COD):**
+   - Habilitado para entregas locales dentro del cantón Cuenca.
 
-### Paso 2: Validación del Desglose de Facturación y Envío
-1. En la página de pago, complete los datos de facturación (Nombre, Apellido, Cédula/RUC, Dirección en Cuenca, Teléfono y Correo Electrónico).
-2. Verifique la tabla de resumen del pedido:
-   - Subtotal Físico: $21.00
-   - Subtotal Digital: $5.99
-   - Tarifa Plana de Envío (Cuenca): $2.50 *(Observe que el sistema no duplicó ni recargó flete por el Ebook)*.
-   - IVA (15%): Calculado exactamente sobre los productos gravados y el flete.
-   - Total Final en Dólares Estadounidenses (USD).
+---
 
-### Paso 3: Selección del Método de Pago
-1. Seleccione la opción **"Transferencia Bancaria Directa"**.
-2. Lea las instrucciones mostradas en pantalla (cuentas corrientes en Banco Pichincha / Banco Guayaquil).
-3. Marque la casilla de aceptación de los Términos, Condiciones y Políticas de Entrega de LibroMundo.
-4. Presione el botón **"Realizar el Pedido"**.
+### FASE 5: SMTP TRANSACCIONAL, MAILTRAP Y CONTROL DE VELOCIDAD
+1. **Resolución del Bloqueo de Puertos Locales:**
+   - Se identificó que proveedores de internet en Ecuador bloquean los puertos salientes 25, 465 y 587 hacia servidores SMTP externos.
+   - **Solución técnica:** Se enrutó el tráfico hacia Mailtrap Sandbox utilizando el puerto alternativo **`2525`** con cifrado TLS en FluentSMTP, logrando una latencia de conexión de 0.12 segundos.
+2. **Corrección del Rate-Limit de Mailtrap Sandbox (Throttle de 1.5s):**
+   - Durante el checkout, WooCommerce dispara 2 correos simultáneos (uno al administrador y otro al cliente). El plan gratuito de Mailtrap Sandbox limita a 1 correo por segundo, causando que el segundo correo rebotara con `422 Data not accepted`.
+   - **Solución implementada:** Se integró en `wp-snippets/libromundo-design.php` un filtro sobre `wp_mail` que mide el tiempo transcurrido y aplica una pausa de seguridad de 1.5 segundos entre envíos consecutivos. Con esto, tanto la notificación al vendedor como la factura al cliente ingresan con estado `250 2.0.0 Ok: queued`.
+3. **Entrega de Facturas y Ebooks:**
+   - Se activó la plantilla de correo `WC_Email_Customer_Invoice`.
+   - Cuando el pedido pasa al estado **"Completado"**, el cliente recibe el correo con la factura formal y sus botones protegidos de descarga directa de los Ebooks.
 
-### Paso 4: Recepción de Correo y Acceso a la Descarga Digital
-1. Acceda a la bandeja de entrada del correo ingresado (o la bandeja de pruebas en Mailtrap).
-2. Abra el correo con asunto: *"Tu pedido en LibroMundo ha sido recibido y procesado"*.
-3. En la sección **"Tus Descargas Digitales"**, haga clic en el enlace del archivo *"El Arte de la Guerra PDF/ePub"*.
-4. Compruebe que la descarga del archivo inicia de forma protegida.
-5. Ingrese a `http://localhost:8080/mi-cuenta/downloads/` para corroborar que el contador indica: *"2 descargas restantes - Caduca en 7 días"*.
+---
 
-### Paso 5: Consulta por WhatsApp de un Libro Agotado o por Encargo
-1. Busque en el catálogo un producto que tenga inventario en cero o ingrese a la ficha de cualquier libro deseado.
-2. Ubique debajo del botón de compra el botón distintivo en verde: *"¿Libro agotado o por encargo? Consultar disponibilidad"*.
-3. Al hacer clic, se abrirá la aplicación o la interfaz web de WhatsApp Web dirigida al número `+593 99 123 4567`.
-4. Compruebe que la barra de texto tiene precargado el mensaje automático con el título exacto del libro y el enlace directo de la ficha técnica.
-5. Presione enviar para contactar directamente al librero de turno.
+### FASE 6: BOTÓN DINÁMICO DE WHATSAPP (`0987852260`)
+1. **Plugin Must-Use (`wp-content/mu-plugins/libromundo-whatsapp-button.php`):**
+   - Se programó una función enganchada a `woocommerce_single_product_summary` con prioridad 35 (justo debajo del botón de compra).
+   - **Número telefónico oficial configurado:** **`593987852260`** (`0987852260`).
+   - El botón detecta si el producto está disponible o agotado y genera un enlace seguro RFC 3986 hacia `wa.me`:
+     ```text
+     ¡Hola LibroMundo! Deseo consultar información o disponibilidad especial sobre:
+     📚 *1984 - George Orwell* (Ref: LF-1984-002)
+     🔗 Ver enlace: http://localhost:8080/?product=1984-george-orwell
+     ¿Cuál sería el tiempo estimado de entrega o precio?
+     ```
+2. **Botón Flotante General (Joinchat):**
+   - Conectado al mismo número `+593987852260` con retardo de 0 segundos para soporte general.
+
+---
+
+### FASE 7: PÁGINAS LEGALES E INSTITUCIONALES
+Se redactaron y publicaron dos páginas con validez jurídica conforme a la Ley de Defensa del Consumidor de Ecuador:
+1. **Política de Envíos y Entregas Digitales (ID: 32 / `/politica-de-envios-y-entregas-digitales`):**
+   - Zonas locales y nacionales, tarifas de $2.50 y $5.00, plazos de 24 a 72 horas y cláusula de entrega digital inmediata.
+2. **Política de Devoluciones y Garantías (ID: 33 / `/politica-de-devoluciones-y-garantias`):**
+   - Garantía de 7 días para libros impresos y artículos de papelería ante fallas de imprenta.
+   - **Cláusula especial de exclusión:** Advertencia legal de que los productos digitales intangibles (Ebooks) no admiten derecho al retracto ni reembolso una vez generado el enlace de descarga.
+
+---
+
+### FASE 8: REDISEÑO VISUAL EDITORIAL Y EXPERIENCIA DE USUARIO
+Para transformar la interfaz básica en una librería profesional y sobria sin sobrecargarla, se programó el mu-plugin `libromundo-design.php`:
+
+1. **Cabecera y Navegación:**
+   - Cabecera fija (`sticky`) con fondo blanco y sombra suave.
+   - Logotipo y marca: **LibroMundo 📚** en tipografía serif `Cardo` color vino corporativo (`#722F37`).
+   - Menú superior limpio: enlaces a **Tienda**, **Mi Cuenta** y desplegable de **Políticas** (*Envíos* y *Devoluciones*). Se eliminó la página basura por defecto (*Página de ejemplo*).
+2. **Catálogo y Tarjetas de Productos (Cards):**
+   - Fondo general cálido tono papel marfil (`#fbfaf8`).
+   - Tarjetas contenidas con borde `#eae7e1`, esquinas redondeadas (`12px`) y suave elevación hover (`translateY(-4px)`).
+   - **Badges flotantes temáticos:** `⚡ EBOOK DIGITAL` (vino), `📖 LIBRO FÍSICO` (azul pizarra) y `✏️ PAPELERÍA` (petróleo).
+   - Portadas enmarcadas con `object-fit: contain` sobre fondo neutro `#f6f5f1`, garantizando que ninguna portada quede recortada.
+   - Botones *"Añadir al carrito"* y *"Seleccionar opciones"* perfectamente alineados al pie de cada tarjeta en color vino (`#722F37`).
+3. **Portal de Usuario "Mi Cuenta":**
+   - Maquetación estilo dashboard de 2 columnas.
+   - Menú lateral con iconos temáticos (`🏠 Escritorio`, `📦 Pedidos`, `📥 Descargas`, `📍 Direcciones`, `👤 Detalles`, `🚪 Salir`) y pestaña activa destacada.
+   - Tarjeta de bienvenida destacada para el cliente logueado y tablas de pedidos/descargas con tipografía limpia.
+4. **Páginas de Políticas:**
+   - Contenedor centralizado tipo pliego editorial (`max-width: 860px`) con subtítulos decorados en color vino, listas con viñetas estilizadas y cuadro de aviso legal destacado en tono ámbar.
+
+---
+
+## 4. GUÍA RÁPIDA DE PUESTA EN MARCHA Y VERIFICACIÓN
+
+### 1. Iniciar los contenedores:
+```bash
+docker compose up -d
+```
+Verificar que los 3 contenedores estén activos:
+```bash
+docker compose ps
+```
+
+### 2. URLs de Acceso Local:
+- **Tienda Pública:** `http://localhost:8080/`
+- **Panel de Usuario:** `http://localhost:8080/?page_id=9`
+- **Políticas de Envío:** `http://localhost:8080/?page_id=32`
+- **Políticas de Devolución:** `http://localhost:8080/?page_id=33`
+- **Administración WordPress:** `http://localhost:8080/wp-admin/`
+- **Base de Datos phpMyAdmin:** `http://localhost:8081/`
+
+### 3. Protocolo de Prueba de Ebooks y Facturación en Mailtrap:
+1. Realice una compra como cliente con cualquier producto (ej. un libro físico y un Ebook).
+2. Abra `https://mailtrap.io` e ingrese con `rivadeneriatito78@gmail.com`.
+3. Vaya a **Inboxes > My Inbox**.
+4. Observe la llegada de la notificación de venta y la confirmación del pedido.
+5. Ingrese a `http://localhost:8080/wp-admin/`, vaya a `WooCommerce > Pedidos` y cambie el pedido a **"Completado"**.
+6. En Mailtrap verá llegar de inmediato el correo con el desglose de la factura legal con IVA 15% y los botones de descarga de los Ebooks comprados.
+7. Al hacer clic en descargar, el cliente recibe el PDF protegido y en `Mi Cuenta > Descargas` se descuenta el intento (de 3 a 2 restantes) con su fecha de vencimiento a 7 días.
+
+### 4. Prueba del Botón de WhatsApp:
+1. Abra cualquier libro en la tienda (ej. *1984*).
+2. Haga clic en el botón verde *"¿Libro agotado o por encargo? Consultar disponibilidad"*.
+3. Verifique que se abra WhatsApp Web con el destinatario **`0987852260`** (`593987852260`) y el texto autocompletado con el título y enlace del libro.
+
+---
+
+## 5. CONCLUSIÓN TÉCNICA
+El proyecto **LibroMundo** cumple rigurosamente con los estándares de ingeniería de software para e-commerce: alta disponibilidad mediante contenedores, aislamiento de secretos de configuración, cumplimiento de normativas fiscales y legales de Ecuador, automatización de entrega de activos digitales con límites de propiedad intelectual, comunicación omnicanal asistida por WhatsApp y una experiencia de usuario sobria, moderna y visualmente atractiva.
