@@ -2,7 +2,7 @@
 /**
  * Plugin Name: LibroMundo - Diseño Editorial Sutil
  * Description: Mejora visual sutil, elegante y moderna para LibroMundo sin sobrecargar el sitio.
- * Version: 1.1.0
+ * Version: 1.2.0
  * Author: LibroMundo Web Engineering Team
  */
 
@@ -120,14 +120,16 @@ add_action('wp_head', function() {
             border-radius: 999px !important;
         }
 
-        /* 3. Título de la Tienda y Filtros */
+        /* 3. Títulos Generales de Página */
+        h1.wp-block-post-title,
         .wp-block-query-title {
             font-family: 'Cardo', Georgia, serif !important;
             font-size: 2.2rem !important;
             font-weight: 700 !important;
             color: var(--lm-slate) !important;
             margin-top: 1.5rem !important;
-            margin-bottom: 0.25rem !important;
+            margin-bottom: 0.5rem !important;
+            text-align: center !important;
         }
 
         .woocommerce-ordering select.orderby {
@@ -149,7 +151,7 @@ add_action('wp_head', function() {
             font-size: 0.9rem !important;
         }
 
-        /* 4. Tarjetas de Productos (Grid Responsivo y Equilibrado) */
+        /* 4. Tarjetas de Productos (Catálogo) */
         ul.wc-block-product-template,
         .wc-block-product-template__responsive {
             display: grid !important;
@@ -313,7 +315,7 @@ add_action('wp_head', function() {
             width: 100% !important;
         }
 
-        /* 5. Botones generales y de añadir al carrito */
+        /* 5. Botones generales */
         .wp-block-button__link,
         .wc-block-components-product-button__button,
         .woocommerce button.button,
@@ -329,9 +331,9 @@ add_action('wp_head', function() {
             transition: all 0.2s ease !important;
             box-shadow: 0 2px 5px rgba(114, 47, 55, 0.18) !important;
             text-decoration: none !important;
-            width: 100% !important;
             text-align: center !important;
             cursor: pointer !important;
+            display: inline-block !important;
         }
         .wp-block-button__link:hover,
         .wc-block-components-product-button__button:hover,
@@ -343,28 +345,241 @@ add_action('wp_head', function() {
             transform: translateY(-1px) !important;
         }
 
-        /* 6. Detalles en Ficha de Producto Individual */
-        .woocommerce div.product p.price,
-        .woocommerce div.product span.price {
-            color: var(--lm-burgundy) !important;
-            font-size: 1.5rem !important;
-            font-weight: 700 !important;
+        /* ============================================================
+           6. SECCIÓN "MI CUENTA" (PORTAL DE USUARIO)
+           ============================================================ */
+        .woocommerce-account .entry-content {
+            max-width: 1000px !important;
+            width: 100% !important;
+            margin: 0 auto 50px auto !important;
         }
-        .woocommerce div.product .quantity input.qty {
-            border: 1px solid var(--lm-border) !important;
-            border-radius: var(--lm-radius-sm) !important;
-            padding: 8px !important;
-            font-weight: 600 !important;
-        }
-        .woocommerce-tabs ul.tabs {
-            border-bottom: 1px solid var(--lm-border) !important;
-        }
-        .woocommerce-tabs ul.tabs li.active a {
-            color: var(--lm-burgundy) !important;
-            border-bottom: 2px solid var(--lm-burgundy) !important;
+        .woocommerce-account .woocommerce {
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 30px !important;
+            align-items: flex-start !important;
         }
 
-        /* 7. Carrito y Finalizar Compra */
+        /* Menú lateral de navegación */
+        .woocommerce-account .woocommerce-MyAccount-navigation {
+            float: none !important;
+            width: 250px !important;
+            flex-shrink: 0 !important;
+        }
+        .woocommerce-MyAccount-navigation ul {
+            list-style: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            background-color: #ffffff !important;
+            border: 1px solid var(--lm-border) !important;
+            border-radius: var(--lm-radius) !important;
+            overflow: hidden !important;
+            box-shadow: var(--lm-shadow-sm) !important;
+        }
+        .woocommerce-MyAccount-navigation ul li {
+            margin: 0 !important;
+            border-bottom: 1px solid #f2eee8 !important;
+        }
+        .woocommerce-MyAccount-navigation ul li:last-child {
+            border-bottom: none !important;
+        }
+        .woocommerce-MyAccount-navigation ul li a {
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            padding: 13px 18px !important;
+            color: var(--lm-slate) !important;
+            font-weight: 500 !important;
+            font-size: 0.93rem !important;
+            text-decoration: none !important;
+            transition: all 0.2s ease !important;
+        }
+        .woocommerce-MyAccount-navigation ul li:hover a {
+            background-color: var(--lm-burgundy-light) !important;
+            color: var(--lm-burgundy) !important;
+            padding-left: 22px !important;
+        }
+        .woocommerce-MyAccount-navigation ul li.is-active a {
+            background-color: var(--lm-burgundy) !important;
+            color: #ffffff !important;
+            font-weight: 600 !important;
+        }
+
+        /* Iconos temáticos de navegación */
+        .woocommerce-MyAccount-navigation-link--dashboard a::before { content: "🏠"; font-size: 1rem; }
+        .woocommerce-MyAccount-navigation-link--orders a::before { content: "📦"; font-size: 1rem; }
+        .woocommerce-MyAccount-navigation-link--downloads a::before { content: "📥"; font-size: 1rem; }
+        .woocommerce-MyAccount-navigation-link--edit-address a::before { content: "📍"; font-size: 1rem; }
+        .woocommerce-MyAccount-navigation-link--edit-account a::before { content: "👤"; font-size: 1rem; }
+        .woocommerce-MyAccount-navigation-link--customer-logout a::before { content: "🚪"; font-size: 1rem; }
+
+        /* Contenido del panel */
+        .woocommerce-account .woocommerce-MyAccount-content {
+            float: none !important;
+            flex: 1 !important;
+            min-width: 320px !important;
+            background-color: #ffffff !important;
+            border: 1px solid var(--lm-border) !important;
+            border-radius: var(--lm-radius) !important;
+            padding: 30px !important;
+            box-shadow: var(--lm-shadow-sm) !important;
+            min-height: 380px !important;
+        }
+
+        /* Caja de bienvenida personalizada */
+        .woocommerce-MyAccount-content > p:first-of-type {
+            background-color: #fbfaf8 !important;
+            border: 1px solid #edebe8 !important;
+            border-left: 4px solid var(--lm-burgundy) !important;
+            border-radius: var(--lm-radius-sm) !important;
+            padding: 16px 20px !important;
+            margin-bottom: 20px !important;
+            font-size: 1.02rem !important;
+            color: var(--lm-slate) !important;
+            line-height: 1.5 !important;
+        }
+        .woocommerce-MyAccount-content > p:first-of-type strong {
+            color: var(--lm-burgundy) !important;
+        }
+        .woocommerce-MyAccount-content a {
+            color: var(--lm-burgundy) !important;
+            font-weight: 600 !important;
+            text-decoration: underline !important;
+            text-underline-offset: 3px !important;
+        }
+        .woocommerce-MyAccount-content a:hover {
+            color: var(--lm-burgundy-dark) !important;
+        }
+
+        /* Tablas dentro de Mi Cuenta (Pedidos y Descargas) */
+        .woocommerce-MyAccount-content table.woocommerce-orders-table,
+        .woocommerce-MyAccount-content table.woocommerce-table--order-downloads,
+        .woocommerce-MyAccount-content table.my_account_orders {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            border-radius: var(--lm-radius-sm) !important;
+            overflow: hidden !important;
+            border: 1px solid var(--lm-border) !important;
+            margin-top: 14px !important;
+        }
+        .woocommerce-MyAccount-content table th {
+            background-color: #f7f5f0 !important;
+            color: var(--lm-slate) !important;
+            padding: 12px 16px !important;
+            font-size: 0.88rem !important;
+            font-weight: 600 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.04em !important;
+        }
+        .woocommerce-MyAccount-content table td {
+            padding: 14px 16px !important;
+            border-top: 1px solid var(--lm-border) !important;
+            font-size: 0.92rem !important;
+            vertical-align: middle !important;
+        }
+
+        /* Formulario de Inicio de Sesión / Registro (cuando no está logueado) */
+        .woocommerce form.login,
+        .woocommerce form.register {
+            background-color: #ffffff !important;
+            border: 1px solid var(--lm-border) !important;
+            border-radius: var(--lm-radius) !important;
+            padding: 32px !important;
+            max-width: 480px !important;
+            margin: 10px auto 40px auto !important;
+            box-shadow: var(--lm-shadow-sm) !important;
+        }
+        .woocommerce form.login .input-text,
+        .woocommerce form.register .input-text {
+            border: 1px solid #d1d5db !important;
+            border-radius: var(--lm-radius-sm) !important;
+            padding: 10px 14px !important;
+            font-size: 0.95rem !important;
+            width: 100% !important;
+            background-color: #fcfbf9 !important;
+            transition: all 0.2s ease !important;
+            margin-top: 4px !important;
+        }
+        .woocommerce form.login .input-text:focus,
+        .woocommerce form.register .input-text:focus {
+            border-color: var(--lm-burgundy) !important;
+            background-color: #ffffff !important;
+            outline: 2px solid rgba(114, 47, 55, 0.15) !important;
+        }
+
+        /* ============================================================
+           7. PÁGINAS DE POLÍTICAS (ENVÍOS Y DEVOLUCIONES)
+           ============================================================ */
+        .page-id-32 .entry-content,
+        .page-id-33 .entry-content {
+            background-color: #ffffff !important;
+            border: 1px solid var(--lm-border) !important;
+            border-radius: var(--lm-radius) !important;
+            box-shadow: var(--lm-shadow-sm) !important;
+            padding: 36px 42px !important;
+            max-width: 860px !important;
+            width: 100% !important;
+            margin: 10px auto 50px auto !important;
+            line-height: 1.7 !important;
+        }
+        .page-id-32 .entry-content h2,
+        .page-id-33 .entry-content h2 {
+            font-family: 'Cardo', Georgia, serif !important;
+            font-size: 1.45rem !important;
+            font-weight: 700 !important;
+            color: var(--lm-burgundy) !important;
+            margin-top: 1.8rem !important;
+            margin-bottom: 0.8rem !important;
+            padding-bottom: 8px !important;
+            border-bottom: 2px solid #f4efe9 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+        }
+        .page-id-32 .entry-content ul,
+        .page-id-33 .entry-content ul {
+            background-color: #fbfaf8 !important;
+            border: 1px solid #edebe8 !important;
+            border-radius: var(--lm-radius-sm) !important;
+            padding: 16px 20px 16px 36px !important;
+            margin: 16px 0 !important;
+            list-style: square !important;
+        }
+        .page-id-32 .entry-content ul li,
+        .page-id-33 .entry-content ul li {
+            margin-bottom: 8px !important;
+            color: var(--lm-text) !important;
+        }
+        .page-id-32 .entry-content ul li:last-child,
+        .page-id-33 .entry-content ul li:last-child {
+            margin-bottom: 0 !important;
+        }
+        .page-id-32 .entry-content strong,
+        .page-id-33 .entry-content strong {
+            color: var(--lm-slate) !important;
+        }
+
+        /* Cuadro de aviso legal destacado en devoluciones */
+        .page-id-33 .entry-content div[style*="background-color: #FFF3CD"],
+        .page-id-33 .entry-content div[style*="background-color:#FFF3CD"] {
+            background-color: #fffbeb !important;
+            border: 1px solid #fde68a !important;
+            border-left: 5px solid #d97706 !important;
+            border-radius: var(--lm-radius-sm) !important;
+            color: #92400e !important;
+            padding: 16px 20px !important;
+            margin: 20px 0 !important;
+            line-height: 1.6 !important;
+        }
+
+        .page-id-32 .entry-content hr,
+        .page-id-33 .entry-content hr {
+            border: none !important;
+            border-top: 1px solid var(--lm-border) !important;
+            margin: 30px 0 !important;
+        }
+
+        /* 8. Carrito y Finalizar Compra */
         .woocommerce-cart table.cart,
         .woocommerce-checkout #order_review {
             background-color: #ffffff !important;
@@ -380,7 +595,7 @@ add_action('wp_head', function() {
             font-weight: 600 !important;
         }
 
-        /* 8. Pie de Página Sutil */
+        /* 9. Pie de Página Sutil */
         footer.wp-block-template-part {
             background-color: #ffffff !important;
             border-top: 1px solid var(--lm-border) !important;
