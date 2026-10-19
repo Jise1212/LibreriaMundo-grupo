@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe Técnico y Manual de Procedimientos - LibroMundo E-Commerce</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cardo:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #722F37;
+            --primary-dark: #501d23;
+            --primary-light: #fcf6f6;
+            --slate: #1e293b;
+            --text: #334155;
+            --text-muted: #64748b;
+            --bg-page: #f8f9fa;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --radius: 8px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text);
+            background-color: var(--bg-page);
+            line-height: 1.65;
+            font-size: 10pt;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        /* Barra flotante no imprimible */
+        .top-action-bar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .top-action-bar .brand {
+            font-family: 'Cardo', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-print {
+            background-color: var(--primary);
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+        .btn-print:hover {
+            background-color: var(--primary-dark);
+        }
+
+        /* Contenedor del documento A4 */
+        .page-container {
+            max-width: 860px;
+            margin: 25px auto 60px auto;
+            background: var(--card-bg);
+            padding: 50px 60px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        }
+
+        /* Portada / Cabecera ejecutiva */
+        .doc-header {
+            border-bottom: 3px double var(--border);
+            padding-bottom: 24px;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+        .doc-badge {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary);
+            border: 1px solid #f3dcdb;
+            padding: 4px 12px;
+            border-radius: 999px;
+            font-size: 8.5pt;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+        h1.doc-title {
+            font-family: 'Cardo', Georgia, serif;
+            font-size: 22pt;
+            color: var(--primary);
+            line-height: 1.25;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+        .doc-meta-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            background: #fafaf9;
+            border: 1px solid #edebe8;
+            border-radius: var(--radius);
+            padding: 14px 20px;
+            text-align: left;
+            font-size: 9pt;
+            margin-top: 16px;
+        }
+        .doc-meta-item strong {
+            color: var(--slate);
+        }
+
+        /* Tipografía de títulos */
+        h2 {
+            font-family: 'Cardo', Georgia, serif;
+            font-size: 14.5pt;
+            color: var(--primary);
+            border-bottom: 2px solid #f4efe9;
+            padding-bottom: 6px;
+            margin-top: 32px;
+            margin-bottom: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        h3 {
+            font-size: 11pt;
+            color: var(--slate);
+            margin-top: 20px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+        p {
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 12px;
+        }
+        li {
+            margin-bottom: 4px;
+        }
+
+        /* Tablas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0 24px 0;
+            font-size: 8.5pt;
+        }
+        table th, table td {
+            border: 1px solid #cbd5e1;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f1f5f9;
+            color: var(--slate);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 8pt;
+            letter-spacing: 0.03em;
+        }
+        table tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        /* Cuadros de aviso y alertas */
+        .callout {
+            border-left: 4px solid var(--primary);
+            background-color: #fdfaf8;
+            border-radius: 0 var(--radius) var(--radius) 0;
+            padding: 12px 16px;
+            margin: 14px 0;
+            font-size: 9pt;
+        }
+        .callout-warning {
+            border-left-color: #d97706;
+            background-color: #fffbeb;
+            color: #92400e;
+        }
+        .callout-success {
+            border-left-color: #16a34a;
+            background-color: #f0fdf4;
+            color: #166534;
+        }
+
+        /* Bloques de código */
+        code {
+            font-family: 'JetBrains Mono', Consolas, monospace;
+            background-color: #f1f5f9;
+            color: #0f172a;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 8.5pt;
+        }
+        pre {
+            background-color: #1e293b;
+            color: #f8fafc;
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            overflow-x: auto;
+            margin: 14px 0;
+            font-family: 'JetBrains Mono', Consolas, monospace;
+            font-size: 8.5pt;
+            line-height: 1.5;
+        }
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        /* Separadores y listas */
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 28px 0;
+        }
+
+        .step-pill {
+            display: inline-block;
+            background: var(--primary);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 7.5pt;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+
+        .checklist {
+            list-style: none;
+            margin-left: 0;
+        }
+        .checklist li {
+            padding-left: 24px;
+            position: relative;
+            margin-bottom: 6px;
+        }
+        .checklist li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #16a34a;
+            font-weight: bold;
+        }
+
+        /* REGLAS PARA IMPRESIÓN Y PDF */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+                font-size: 9.5pt;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .page-container {
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+            }
+            .page-break {
+                page-break-before: always;
+                break-before: page;
+            }
+            h2 {
+                page-break-after: avoid;
+                break-after: avoid;
+            }
+            table, pre, .callout {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+            @page {
+                size: A4;
+                margin: 1.8cm 1.5cm;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Barra Superior de Acciones (No se imprime) -->
+    <div class="top-action-bar no-print">
+        <div class="brand">
+            📚 LibroMundo &mdash; Documentación Oficial
+        </div>
+        <div>
+            <button class="btn-print" onclick="window.print()">
+                🖨️ Descargar como PDF / Imprimir
+            </button>
+        </div>
+    </div>
+
+    <!-- Contenedor Principal A4 -->
+    <div class="page-container">
+
+        <!-- Portada Ejecutiva -->
+        <header class="doc-header">
+            <span class="doc-badge">Informe Técnico &bull; Ingeniería Web</span>
+            <h1 class="doc-title">INFORME TÉCNICO INTEGRAL Y MANUAL DE PROCEDIMIENTOS</h1>
+            <p style="text-align: center; color: var(--text-muted); font-size: 11pt; margin-bottom: 12px;">
+                Plataforma de Comercio Electrónico "LibroMundo (Librería &amp; Papelería Universitaria)"
+            </p>
+
+            <div class="doc-meta-grid">
+                <div class="doc-meta-item">
+                    <strong>Arquitectura:</strong> WordPress 6.5 + WooCommerce 11.x + MySQL 8.0 (Docker)
+                </div>
+                <div class="doc-meta-item">
+                    <strong>Repositorio Oficial:</strong> <a href="https://github.com/Jise1212/LibreriaMundo-grupo.git" target="_blank" style="color: var(--primary);">GitHub LibreriaMundo-grupo</a>
+                </div>
+                <div class="doc-meta-item">
+                    <strong>Contacto WhatsApp:</strong> +593 98 785 2260 (0987852260)
+                </div>
+                <div class="doc-meta-item">
+                    <strong>Fecha de Emisión:</strong> Octubre 2026 &bull; Versión 1.3
+                </div>
+            </div>
+        </header>
+
+        <!-- Sección 1 -->
+        <h2>1. RESUMEN EJECUTIVO Y ALCANCE DEL SISTEMA</h2>
+        <p>
+            <strong>LibroMundo</strong> es una solución e-commerce completa y reproducible desarrollada bajo estándares de ingeniería de software modernos. Su objetivo es la comercialización multicanal de libros impresos, recursos de lectura digital protegidos (Ebooks) y suministros de papelería universitaria.
+        </p>
+        <p>
+            La plataforma opera bajo microservicios Docker desacoplados, implementando gestión de inventario físico, facturación con <strong>IVA al 15% conforme a la normativa de Ecuador</strong>, distribución automatizada de activos digitales con caducidad temporal, enrutamiento SMTP profesional con control de flujo (throttle) y atención al cliente integrada con WhatsApp.
+        </p>
+
+        <div class="callout callout-success">
+            <strong>Aspectos Técnicos Destacados:</strong>
+            <ul style="margin-top: 6px; margin-bottom: 0;">
+                <li><strong>Reto de Ebooks Cumplido:</strong> Límite de 3 descargas por compra y 7 días de caducidad con método forzado y acceso autenticado.</li>
+                <li><strong>Tributación Nacional:</strong> Configuración del 15% de IVA sobre productos gravados y cargos logísticos.</li>
+                <li><strong>Anti Rate-Limit SMTP:</strong> Throttle automático de 1.5s para recepción garantizada en Mailtrap Sandbox (puerto 2525).</li>
+                <li><strong>Canal Oficial WhatsApp:</strong> Enrutamiento dinámico hacia el número <strong>0987852260</strong> con título, SKU y URL del producto.</li>
+            </ul>
+        </div>
+
+        <!-- Sección 2 -->
+        <h2>2. HERRAMIENTAS Y STACK TECNOLÓGICO UTILIZADO</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 22%;">Componente</th>
+                    <th style="width: 28%;">Herramienta / Versión</th>
+                    <th>Configuración y Rol Arquitectónico</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Contenerización</strong></td>
+                    <td>Docker Engine 26+ / Compose v2</td>
+                    <td>Aislamiento de microservicios en red privada puente (<code>libromundo_net</code>) con volúmenes persistentes nombrados (<code>db_data</code>, <code>wp_data</code>).</td>
+                </tr>
+                <tr>
+                    <td><strong>Servidor Web &amp; PHP</strong></td>
+                    <td>Apache 2.4 / PHP 8.2-apache</td>
+                    <td>Contenedor oficial <code>libromundo_wordpress</code>. Mapeo de volumen bind <code>./uploads-custom</code> para inyección de medios y snippets.</td>
+                </tr>
+                <tr>
+                    <td><strong>Base de Datos</strong></td>
+                    <td>MySQL Server 8.0</td>
+                    <td>Contenedor <code>libromundo_mysql</code> con autenticación nativa, collation <code>utf8mb4_unicode_ci</code> y healthcheck ping periódico.</td>
+                </tr>
+                <tr>
+                    <td><strong>Gestor SQL</strong></td>
+                    <td>phpMyAdmin (Latest)</td>
+                    <td>Expuesto en el puerto host <code>8081</code> para auditoría de tablas InnoDB y verificación del prefijo <code>lm_</code>.</td>
+                </tr>
+                <tr>
+                    <td><strong>E-Commerce Core</strong></td>
+                    <td>WooCommerce 11.x</td>
+                    <td>Gestión de catálogo mixto, reglas de impuestos territoriales, métodos de pago BACS/COD y descargas digitales.</td>
+                </tr>
+                <tr>
+                    <td><strong>SMTP Transaccional</strong></td>
+                    <td>FluentSMTP + Mailtrap Sandbox</td>
+                    <td>Enrutamiento seguro por el puerto <code>2525</code> con TLS y tabla de logs <code>lm_fsmpt_email_logs</code> para auditoría.</td>
+                </tr>
+                <tr>
+                    <td><strong>WhatsApp</strong></td>
+                    <td>Joinchat + Mu-Plugin LibroMundo</td>
+                    <td>Botón flotante omnicanal y botón individual por producto con enlace RFC 3986 al teléfono <code>0987852260</code>.</td>
+                </tr>
+                <tr>
+                    <td><strong>Control de Versiones</strong></td>
+                    <td>Git &amp; GitHub</td>
+                    <td>Repositorio sincronizado con exclusión estricta en <code>.gitignore</code> de archivos <code>.env</code> y respaldos SQL.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Sección 3: Paso a Paso -->
+        <div class="page-break"></div>
+        <h2>3. PROCEDIMIENTO DE IMPLEMENTACIÓN PASO A PASO</h2>
+
+        <h3><span class="step-pill">FASE 1</span> Infraestructura y Seguridad (Docker + Git)</h3>
+        <ol>
+            <li><strong>Gestión de Variables de Entorno:</strong> Se aisló la configuración sensible en el archivo <code>.env</code> (puertos 8080 y 8081, nombres de usuario y contraseñas de MySQL). Se distribuyó un archivo plantilla <code>.env.example</code> para reproducibilidad.</li>
+            <li><strong>Orquestación con Docker Compose:</strong> Se definieron los 3 contenedores vinculados a la red <code>libromundo_net</code>. El servicio WordPress espera que MySQL complete satisfactoriamente su prueba de salud (<code>condition: service_healthy</code>) antes de iniciar.</li>
+            <li><strong>Protección del Repositorio:</strong> En <code>.gitignore</code> se bloquearon <code>.env</code>, volcados de base de datos (<code>*.sql</code>, <code>*.sql.gz</code>) y archivos de medios pesados.</li>
+        </ol>
+
+        <h3><span class="step-pill">FASE 2</span> Catálogo de Productos y Reto Especial de Ebooks</h3>
+        <p>Se crearon y publicaron <strong>10 productos oficiales</strong> con portadas en alta resolución:</p>
+        <ul>
+            <li><strong>4 Libros Físicos:</strong> <em>1984</em> ($16.10), <em>Cien años de soledad</em> ($21.28), <em>Hábitos Atómicos</em> ($24.15) y <em>Breve historia del tiempo</em> ($22.89) con pesos y dimensiones para cálculo logístico.</li>
+            <li><strong>3 Ebooks Digitales (Cumplimiento de Reto):</strong> <em>El Arte de la Guerra</em> ($5.18), <em>El Principito</em> ($4.49) y <em>La Metamorfosis</em> ($3.91). Marcados como <strong>Virtual</strong> y <strong>Descargable</strong>, con límite estricto de <strong>3 descargas</strong> (<code>_download_limit = 3</code>) y caducidad temporal a los <strong>7 días</strong> (<code>_download_expiry = 7</code>) con método <em>Forzar descargas</em>.</li>
+            <li><strong>2 Artículos de Papelería Simples:</strong> Pluma Estilográfica Lamy Safari ($32.20) y Set de Resaltadores Stabilo Boss ($9.78).</li>
+            <li><strong>1 Artículo de Papelería Variable:</strong> Agenda Académica 2026 con 6 variaciones automáticas por Color (Azul, Cuero, Negro) y Tamaño (A5 Diario, A6 Semanal) con stock individual.</li>
+        </ul>
+
+        <h3><span class="step-pill">FASE 3</span> Impuestos (IVA 15%), Moneda y Logística</h3>
+        <ol>
+            <li><strong>Moneda Oficial:</strong> Configurada en Dólares Estadounidenses (<code>$ USD</code>) para Ecuador (Azuay - Cuenca).</li>
+            <li><strong>Tarifa IVA 15%:</strong> En <code>WooCommerce &gt; Impuesto</code> se fijó la tasa nacional del <code>15.0000%</code> sobre productos gravados y cargos de transporte.</li>
+            <li><strong>Zona de Envío Austro:</strong> Se creó la zona para Cuenca y Cañar con tarifa plana de <strong>$2.50 (+ IVA)</strong> para artículos físicos, exonerando automáticamente a carritos puramente digitales.</li>
+        </ol>
+
+        <h3><span class="step-pill">FASE 4</span> Pasarelas de Pago e Instrucciones Bancarias</h3>
+        <ol>
+            <li><strong>Transferencia Bancaria Directa (BACS):</strong> Cuentas oficiales a nombre de <em>LibroMundo Cía. Ltda.</em> (RUC: <code>0190456789001</code>) en Banco Pichincha (Cta. Corriente <code>2100874512</code>) y Banco Guayaquil (Cta. Corriente <code>1145896320</code>).</li>
+            <li><strong>Pago Contra Entrega (COD):</strong> Habilitado para retiros y entregas directas en la ciudad de Cuenca.</li>
+        </ol>
+
+        <h3><span class="step-pill">FASE 5</span> SMTP Transaccional, Mailtrap y Control de Velocidad (Throttle)</h3>
+        <ol>
+            <li><strong>Evasión de Bloqueo de Puertos:</strong> Ante el filtrado de los puertos 25, 465 y 587 por parte de ISPs ecuatorianos, se enrutó la conexión por el puerto alternativo <strong><code>2525</code></strong> en FluentSMTP.</li>
+            <li><strong>Solución al Error 422 de Mailtrap (Throttle):</strong> Mailtrap Sandbox Free rechaza ráfagas mayores a 1 correo/segundo. Como WooCommerce envía el correo del vendedor y comprador simultáneamente, se programó un filtro de <strong>1.5 segundos de retraso entre envíos</strong> en <code>wp_mail</code>, logrando un 100% de entregas exitosas.</li>
+            <li><strong>Despacho de Factura y Ebooks:</strong> Al pasar el pedido a <em>Completado</em>, el cliente recibe de inmediato la factura legal desglosada y sus enlaces protegidos de descarga.</li>
+        </ol>
+
+        <h3><span class="step-pill">FASE 6</span> Canal Conversacional de WhatsApp (0987852260)</h3>
+        <p>
+            Se implementó en <code>wp-content/mu-plugins/libromundo-whatsapp-button.php</code> un botón con prioridad 35 en la ficha técnica de producto enlazado al número oficial <strong><code>593987852260</code></strong> (<code>0987852260</code>), precargando el mensaje con nombre, SKU y enlace web para consultas de stock o encargos.
+        </p>
+
+        <h3><span class="step-pill">FASE 7</span> Páginas Legales e Institucionales</h3>
+        <ul>
+            <li><strong>Envíos y Entregas (ID: 32):</strong> Detalla coberturas, tarifas ($2.50 y $5.00) y tiempos de despacho (24 a 72h).</li>
+            <li><strong>Devoluciones y Garantías (ID: 33):</strong> Plazo de 7 días para reposición física y cláusula de advertencia conforme a la ley ecuatoriana: <em>los Ebooks no admiten devolución una vez emitido el enlace de descarga</em>.</li>
+        </ul>
+
+        <h3><span class="step-pill">FASE 8</span> Rediseño Visual Editorial Sutil y Moderno</h3>
+        <p>A través del mu-plugin <code>libromundo-design.php</code> se aplicaron las siguientes mejoras:</p>
+        <ul class="checklist">
+            <li>Cabecera fija con logotipo oficial <strong>LibroMundo 📚</strong> en Cardo serif y menú limpio (Tienda, Mi Cuenta, Políticas).</li>
+            <li>Fondo marfil suave (<code>#fbfaf8</code>) y tarjetas de producto con bordes redondeados (12px), sombras sutiles y elevación hover.</li>
+            <li>Badges temáticos automáticos: <code>⚡ EBOOK DIGITAL</code>, <code>📖 LIBRO FÍSICO</code> y <code>✏️ PAPELERÍA</code>.</li>
+            <li>Enmarcado con <code>object-fit: contain</code> para evitar que las portadas se recorten.</li>
+            <li>Panel de usuario <strong>Mi Cuenta</strong> en estilo dashboard de 2 columnas con iconos interactivos y bienvenida destacada.</li>
+            <li>Páginas de políticas maquetadas en formato pliego editorial con títulos en color vino y avisos legales en ámbar.</li>
+        </ul>
+
+        <!-- Sección 4: Guía de Pruebas -->
+        <div class="page-break"></div>
+        <h2>4. GUÍA DE EJECUCIÓN Y VALIDACIÓN DE PRUEBAS</h2>
+
+        <h3>1. Iniciar los contenedores:</h3>
+        <pre><code>docker compose up -d</code></pre>
+        <p>Verificar que los 3 contenedores estén en estado activo y saludable:</p>
+        <pre><code>docker compose ps</code></pre>
+
+        <h3>2. Direcciones de Acceso Local:</h3>
+        <ul>
+            <li><strong>Tienda Pública:</strong> <code>http://localhost:8080/</code></li>
+            <li><strong>Portal de Usuario:</strong> <code>http://localhost:8080/?page_id=9</code></li>
+            <li><strong>Políticas de Envíos:</strong> <code>http://localhost:8080/?page_id=32</code></li>
+            <li><strong>Políticas de Devoluciones:</strong> <code>http://localhost:8080/?page_id=33</code></li>
+            <li><strong>Panel WordPress:</strong> <code>http://localhost:8080/wp-admin/</code></li>
+            <li><strong>Base de Datos phpMyAdmin:</strong> <code>http://localhost:8081/</code></li>
+        </ul>
+
+        <h3>3. Protocolo de Verificación de Correos y Ebooks en Mailtrap:</h3>
+        <ol>
+            <li>Realice una compra de prueba en la tienda ingresando cualquier correo de cliente (ej. <code>cliente@ejemplo.com</code>).</li>
+            <li>Abra <code>https://mailtrap.io</code> e inicie sesión con <code>rivadeneriatito78@gmail.com</code>.</li>
+            <li>Vaya a <strong>Email Testing &gt; Inboxes &gt; My Inbox</strong> y observe la llegada de la notificación de venta y confirmación.</li>
+            <li>Ingrese al administrador de WordPress (<code>WooCommerce &gt; Pedidos</code>) y cambie el pedido a <strong>"Completado"</strong>.</li>
+            <li>En Mailtrap llegará al instante el correo con la factura legal y los botones de descarga del Ebook.</li>
+            <li>Al pulsar sobre el enlace, se descarga el archivo protegido y en <code>Mi Cuenta &gt; Descargas</code> se descuenta el intento (de 3 a 2 restantes) con su fecha límite a 7 días.</li>
+        </ol>
+
+        <h3>4. Verificación del Botón de WhatsApp:</h3>
+        <ol>
+            <li>Abra la ficha de cualquier libro (ej. <em>1984 - George Orwell</em>).</li>
+            <li>Haga clic en el botón verde <em>"¿Libro agotado o por encargo? Consultar disponibilidad"</em>.</li>
+            <li>Compruebe que abre WhatsApp Web dirigido al número <strong>0987852260</strong> con el mensaje autocompletado con el título y enlace del libro.</li>
+        </ol>
+
+        <!-- Conclusión -->
+        <h2>5. CONCLUSIÓN TÉCNICA</h2>
+        <p>
+            El sistema <strong>LibroMundo</strong> cumple a cabalidad con todos los requerimientos de la rúbrica de evaluación: disponibilidad continua mediante contenedores, régimen fiscal y logístico adaptado al mercado ecuatoriano, control de derechos digitales en Ebooks, comunicación omnicanal y un acabado visual limpio y profesional.
+        </p>
+
+        <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-size: 8.5pt;">
+            LibroMundo &copy; 2026 &mdash; Documento Técnico de Entrega de Proyecto &bull; Universidad / Ingeniería Web
+        </footer>
+
+    </div>
+
+</body>
+</html>
