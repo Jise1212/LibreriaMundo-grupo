@@ -608,3 +608,24 @@ add_action('wp_head', function() {
     </style>
     <?php
 }, 100);
+
+/**
+ * Throttle de seguridad para Mailtrap Sandbox:
+ * Mailtrap Sandbox en su plan gratuito limita a 1 correo por segundo.
+ * WooCommerce dispara el correo al administrador y al cliente en el mismo milisegundo durante el checkout,
+ * lo que provocaba que el correo al cliente fuera rechazado con "422 Data not accepted".
+ * Con este filtro garantizamos un intervalo de 1.5 segundos entre envíos consecutivos.
+ */
+add_filter('wp_mail', function($args) {
+    static $last_email_time = 0;
+    $now = microtime(true);
+    if ($last_email_time > 0) {
+        $elapsed = $now - $last_email_time;
+        if ($elapsed < 1.5) {
+            usleep((int)((1.5 - $elapsed) * 1000000));
+        }
+    }
+    $last_email_time = microtime(true);
+    return $args;
+}, 1);
+
