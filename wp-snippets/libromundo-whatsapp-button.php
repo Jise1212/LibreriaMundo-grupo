@@ -22,8 +22,8 @@ function libromundo_whatsapp_product_button() {
     }
 
     // Configuración del Número de WhatsApp (Formato internacional Ecuador: 5939XXXXXXXX)
-    // Reemplaza este número con el número de atención oficial de la librería:
-    $whatsapp_phone = '593991234567';
+    // Número oficial de atención al cliente de la librería:
+    $whatsapp_phone = '593987852260';
 
     // Obtención de metadatos dinámicos del producto
     $product_name = $product->get_name();
